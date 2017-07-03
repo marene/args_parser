@@ -11,10 +11,7 @@ static t_token*		create_token(char* value)
 		ret->value = strdup(value);
 		ret->next = NULL;
 		ret->prev = NULL;
-		printf("create_token: [%s]\n", ret->value);
 	}
-	else
-		printf("create_token(\"%s\") failed\n", value);
 	return (ret);
 }
 

@@ -3,7 +3,7 @@
 #include "test.h"
 #include "args.h"
 
-int tests_run = 0;
+int tests_ran = 0;
 
 static char*		test_create_args_parser()
 {
@@ -47,17 +47,18 @@ static char*		subtest_tokens()
 {
 	t_parser*		p = create_args_parser();
 	t_token*		t = NULL;
-	const int		argc = 3;
-	char*				argv[3] = {"--foobar", "tata yoyo", "-test"};
+	const int		argc = 4;
+	char*				argv[4] = {"NOT AN ARG", "--foobar", "tata yoyo", "-test"};
 
 	add_arg(p, 's', "sort", "toto", 1, 0);            // arg 0
 	add_arg(p, 't', NULL, "short - no long", 1, 0);   // arg 1
 	add_arg(p, 0, "foobar", "no short - long", 1, 0); // arg 2
 	t = create_tokens_string(argc, argv);
-	mu_assert("tokens strign not generated", t != NULL);
-	mu_assert("token 0 is invalid (--foobar)", strcmp(t->value, "--foobar") == 0);
+	mu_assert("tokens string not generated", t != NULL);
+	mu_assert("token 0 is invalid (-test)", strcmp(t->value, "-test") == 0);
 	mu_assert("token 1 is invalid (tata yoyo)", strcmp(t->next->value, "tata yoyo") == 0);
-	mu_assert("token 2 is invalid (-test)", strcmp(t->value, "-test") == 0);
+	mu_assert("token 2 is invalid (--foobar)", strcmp(t->next->next->value, "--foobar") == 0);
+	mu_assert("token 3 should not be generated", t->next->next->next == NULL);
 }
 
 static char*		test_parse()
@@ -70,6 +71,7 @@ static char*		all_tests()
 {
 	mu_run_test(test_create_args_parser);
 	mu_run_test(test_add_arg);
+	mu_run_test(test_parse);
 	return NULL;
 }
 
@@ -82,7 +84,7 @@ int		main(int argc, char** argv)
 		printf("FAIL: %s\n", results);
 		return(1);
 	}
-	printf("ALL TESTS PASSED\n");
+	printf("ALL TESTS PASSED (ran %d tests)\n", tests_ran);
 	return (0);
 	/*
 	t_parser* p = create_args_parser();
