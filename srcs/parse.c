@@ -10,7 +10,7 @@ int			parse(t_parser* p, int argc, char** argv)
 	it = toks;
 	while (it)
 	{
-		printf("%s\n", it->value);
+
 		it = it->next;
 	}
 	return ARG_OK;

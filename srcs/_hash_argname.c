@@ -4,7 +4,7 @@
 char		*_hash_argname(char short_name, char* long_name)
 {
 	char*		hash;
-	size_t	hash_len =  !!short_name + (!long_name) ? 0 : strlen(long_name);
+	size_t	hash_len =  !!short_name + ((!long_name) ? 0 : strlen(long_name));
 
 	hash = malloc(hash_len + 1);
 	hash[hash_len] = '\0';

@@ -9,7 +9,7 @@ t_arg*		create_arg(char short_name, char* long_name, char* desc, int8_t optional
 	if (ret)
 	{
 		ret->short_name = short_name;
-		ret->long_name = (!long_name) ? NULL : strdup(long_name);
+		ret->long_name = (!long_name || strlen(long_name) == 0) ? NULL : strdup(long_name);
 		ret->_hash = _hash_argname(short_name, long_name);
 		ret->desc = strdup(desc);
 		ret->optional = optional;
