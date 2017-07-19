@@ -1,51 +1,41 @@
 #include <string.h>
 #include "args.h"
 
-# include <stdio.h>
-
-/**
- * TODO find a better way to sort-insert into the linked list, i'm am absolutely not satisfied with this current version
- */
-int				_linkedlist_add_arg(t_parser* p, t_arg* new_arg)
+static int8_t		is_lower(t_arg* src, t_arg* ref)
 {
-	t_arg*		iterator;
-	t_arg*		tmp;
+	return (!src->long_name || (ref->long_name && strcmp(src->long_name, ref->long_name) < 0));
+}
 
-	if (p->args == NULL || !new_arg->long_name || (p->args->long_name && strcmp(new_arg->long_name, p->args->long_name) <= 0))
+static int8_t		is_greater(t_arg* src, t_arg* ref)
+{
+	return (!ref->long_name || (src->long_name && strcmp(src->long_name, ref->long_name) >= 0));
+}
+
+static int8_t		is_between(t_arg* new, t_arg* min, t_arg* max)
+{
+	return (is_lower(min, new) && (!max || is_greater(max, new)));
+}
+
+int							_linkedlist_add_arg(t_parser* p, t_arg* new_arg)
+{
+	t_arg*		it;
+
+	if (p->args == NULL || is_lower(new_arg, p->args))
 	{
-		printf("inserted --%s at root\n", new_arg->long_name);
 		new_arg->left = p->args;
 		p->args = new_arg;
 		return (ARG_OK);
 	}
-	iterator = p->args;
-	while (iterator)
+	it = p->args;
+	while (it)
 	{
-		if ((iterator->long_name && strcmp(new_arg->long_name, iterator->long_name) > 0) || iterator->left == NULL)
+		if (is_between(new_arg, it, it->left))
 		{
-			printf("inserted --%s between --%s and --%s\n", new_arg->long_name, iterator->long_name, (iterator->left) ? iterator->left->long_name : "END");
-			tmp = iterator->left;
-			iterator->left = new_arg;
-			new_arg->left = tmp;
-			return ARG_OK;
+			new_arg->left = it->left;
+			it->left = new_arg;
+			return (ARG_OK);
 		}
-		else if (!iterator->long_name)
-		{
-			if (iterator->left->long_name && strcmp(iterator->left->long_name, new_arg->long_name) > 0)
-			{
-				printf("inserted --%s between --%s and --%s\n", new_arg->long_name, iterator->long_name, (iterator->left) ? iterator->left->long_name : "END");
-				tmp = iterator->left;
-				iterator->left = new_arg;
-				new_arg->left = tmp; // TODO I'm not sure tmp is actually needed for all insertions operations, checkthat after you get some sleep
-			}
-			else
-			{
-				new_arg = iterator->left->left;
-				iterator->left->left = new_arg;
-			}
-			return ARG_OK;
-		}
-		iterator = iterator->left;
+		it = it->left;
 	}
 	return (ARG_NOK);
 }
@@ -64,4 +54,57 @@ t_arg*		_linkedlist_iterate_next(t_parser* p)
 void			_linkedlist_iterate_reinit(t_parser* p)
 {
 	p->_iterator = NULL;
+}
+
+int				_linked_list_add_short(t_parser* p, t_token* tok)
+{
+	t_arg*	it;
+
+	it = p->args;
+	while (it)
+	{
+		if (strcmp(it->short_name, tok->value[1]))
+		{
+			p->last_mentionned = it;
+			return (ARG_OK);
+		}
+		it = it->left;
+	}
+	return (ARG_NOK);
+}
+
+int				_linked_list_add_long(t_parser* p, t_token* tok)
+{
+	char*		equal;
+	char*		arg;
+	char*		value;
+	size_t	len;
+	t_arg*	it;
+
+	equal = strstr(tok->value, "=");
+	if (equal)
+	{
+		len = equal - (tok->value + strlen("--"));
+		arg = strndup(tok->value + 2, len);
+		value = strdup(equal + 1); // TODO what if --arg= and nothing after equal
+	}
+	else
+	{
+		arg = strdup(tok->value + 2);
+		value = NULL;
+		len = 0;
+	}
+	it = p->args;
+	while (it)
+	{
+		if (it->long_name && strcmp(arg, it->long_name))
+		{
+			// TODO add value to it->values if any
+			free(arg);
+			free(value);
+			return (ARG_OK);
+		}
+		it = it->left;
+	}
+	return (ARG_NOK);
 }

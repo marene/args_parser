@@ -9,7 +9,7 @@ static int8_t		is_long(char* str)
 
 static int8_t		is_short(char* str)
 {
-	return ((str && strlen(str) > 1 && str[0] == '-' && str[1] != '-'));
+	return ((str && strlen(str) == 2 && str[0] == '-' && str[1] != '-'));
 }
 
 static int8_t		is_arg(char* str)
@@ -24,8 +24,11 @@ int							parse(t_parser* p, int argc, char** argv)
 
 	toks = create_tokens_string(argc, argv);
 	it = toks;
+	if (!is_arg(it->value))
+		return (ARG_NOK);
 	while (it)
 	{
+		
 		it = it->next;
 	}
 	return ARG_OK;
