@@ -26,7 +26,6 @@ int							parse(t_parser* p, int argc, char** argv)
 	it = toks;
 	while (it)
 	{
-		if ()
 		it = it->next;
 	}
 	return ARG_OK;
