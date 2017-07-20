@@ -22,6 +22,13 @@ typedef struct		s_arg
 	struct s_arg*		left;
 }									t_arg;
 
+typedef struct	s_token
+{
+	char*							value;
+	struct s_token*		next;
+	struct s_token*		prev;
+}							t_token;
+
 typedef struct		s_parser
 {
 	t_arg*											args;
@@ -33,13 +40,6 @@ typedef struct		s_parser
 	t_arg* (*iterate_next)(struct s_parser*);
 	void (*iterate_reinit)(struct s_parser*);
 }								t_parser;
-
-typedef struct	s_token
-{
-	char*							value;
-	struct s_token*		next;
-	struct s_token*		prev;
-}							t_token;
 
 t_parser*				create_args_parser(void);
 t_arg*					create_arg(char short_name, char* long_name, char* desc, int8_t optional, int8_t mult);
@@ -57,5 +57,7 @@ char*						_hash_argname(char short_name, char* long_name);
 t_arg*					_linkedlist_iterate_next(t_parser* p);
 void						_linkedlist_iterate_reinit(t_parser* p);
 int							_linkedlist_add_arg(t_parser *p, t_arg* new_arg);
+int							_linkedlist_add_long(t_parser* p, t_token* tok);
+int							_linkedlist_add_short(t_parser* p, t_token* tok);
 
 # endif

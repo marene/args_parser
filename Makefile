@@ -7,6 +7,8 @@ OBJS_DIR=				./objs/
 TESTS_DIR=			./tests/
 SRCS=						_hash_argname.c\
 								add_arg.c\
+								add_long.c\
+								add_short.c\
 								create_arg.c\
 								create_args_parser.c\
 								linked_list_handlers.c\

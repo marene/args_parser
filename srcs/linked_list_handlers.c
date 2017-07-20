@@ -56,14 +56,14 @@ void			_linkedlist_iterate_reinit(t_parser* p)
 	p->_iterator = NULL;
 }
 
-int				_linked_list_add_short(t_parser* p, t_token* tok)
+int				_linkedlist_add_short(t_parser* p, t_token* tok)
 {
 	t_arg*	it;
 
 	it = p->args;
 	while (it)
 	{
-		if (strcmp(it->short_name, tok->value[1]))
+		if (it->short_name == tok->value[1])
 		{
 			p->last_mentionned = it;
 			return (ARG_OK);
@@ -73,7 +73,36 @@ int				_linked_list_add_short(t_parser* p, t_token* tok)
 	return (ARG_NOK);
 }
 
-int				_linked_list_add_long(t_parser* p, t_token* tok)
+static char**		add_value(t_arg* arg, char* value)
+{
+	char		**tmp;
+	int			size;
+
+	size = 0;
+	if (!arg->values)
+	{
+		arg->values = malloc(sizeof(char*) * 2);
+		arg->values[0] = strdup(value);
+		arg->values[1] = NULL;
+		return arg->values;
+	}
+	while (arg->values[size])
+		size++;
+	size++;
+	tmp = malloc(sizeof(char*) * (size + 1));
+	tmp[size] = NULL;
+	tmp[--size] = strdup(value);
+	while (--size >= 0)
+	{
+		tmp[size] = strdup(arg->values[size]); // here we re-allocate a new string to copy each already existent values
+		free(arg->values[size]);               // wouldn't it be better to just keep the laready allocated string from valeus to tmp?
+	}
+	free(arg->values);
+	arg->values = tmp;
+	return (tmp);
+}
+
+int						_linkedlist_add_long(t_parser* p, t_token* tok)
 {
 	char*		equal;
 	char*		arg;
